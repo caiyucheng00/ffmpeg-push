@@ -1,0 +1,10 @@
+*.aac
+*.h264
+*.mp3
+*.mp4
+*.pcm
+*.yuv
+*.txt
+*.dll
+x64/
+.vs/
