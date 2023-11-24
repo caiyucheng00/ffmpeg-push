@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClCompile Include="AACEncoder.cpp" />
     <ClCompile Include="AudioCapture.cpp" />
+    <ClCompile Include="AudioResample.cpp" />
     <ClCompile Include="AvTimeBase.cpp" />
     <ClCompile Include="CommonLooper.cpp" />
     <ClCompile Include="H264Encoder.cpp" />
@@ -163,6 +164,7 @@
   <ItemGroup>
     <ClInclude Include="AACEncoder.h" />
     <ClInclude Include="AudioCapture.h" />
+    <ClInclude Include="AudioResample.h" />
     <ClInclude Include="AvTimeBase.h" />
     <ClInclude Include="CommonLooper.h" />
     <ClInclude Include="H264Encoder.h" />

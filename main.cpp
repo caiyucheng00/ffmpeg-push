@@ -41,8 +41,8 @@ int main(int args, char* argv[]) {
 	Message msg;
 	int ret = 0;
 	while (true) {
-		//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-		ret = message_list->Get(&msg, 1000);
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		/*ret = message_list->Get(&msg, 1000);
 		if (1 == ret) {
 			switch (msg.what) {
 			case MSG_RTSP_ERROR:
@@ -54,16 +54,16 @@ int main(int args, char* argv[]) {
 			default:
 				break;
 			}
-		}
+		}*/
 		
-		if (count++ > 100) {
+		if (count++ > 10000) {
 			printf("main break\n");
 			break;
 		}
 	}
 
-	message_list->Abort();
-	delete message_list;
+	//message_list->Abort();
+	//delete message_list;
 
 	cout << "Ö÷º¯Êý½áÊø" << endl;
 }

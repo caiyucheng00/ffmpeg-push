@@ -2,6 +2,7 @@
 #define __PUSHWORK__H_
 
 #include "AudioCapture.h"
+#include "AudioResample.h"
 #include "VideoCapture.h"
 #include "AACEncoder.h"
 #include "H264Encoder.h"
@@ -36,6 +37,8 @@ private:
 
 	AudioCapture* audio_capture_ = NULL;
 	VideoCapture* video_capture_ = NULL;
+
+	AudioResample* audio_resample_ = NULL;
 
 	AACEncoder* aac_encoder_ = NULL;
 	H264Encoder* h264_encoder_ = NULL;
