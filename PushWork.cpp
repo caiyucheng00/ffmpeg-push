@@ -76,6 +76,21 @@ RET_CODE PushWork::Init(const Properties& properties)
 		return RET_FAIL;
 	}
 
+	// 音频重采样
+	audio_resample_ = new AudioResample();
+	Properties  audio_resample_properties;
+	audio_resample_properties.SetProperty("in_sample_rate", 48000);
+	audio_resample_properties.SetProperty("in_channels", 2);
+	audio_resample_properties.SetProperty("in_sample_fmt", AV_SAMPLE_FMT_S16);	
+	audio_resample_properties.SetProperty("out_sample_rate", 48000);
+	audio_resample_properties.SetProperty("out_channels", 2);
+	audio_resample_properties.SetProperty("out_sample_fmt", AV_SAMPLE_FMT_FLTP);
+	
+	if (audio_resample_->Init(audio_resample_properties) != RET_OK)
+	{
+		printf("AACEncoder Init failed\n");
+		return RET_FAIL;
+	}
 	int frame_bytes2 = 0;
 	// 默认读取出来的数据是s16的，编码器需要的是fltp, 需要做重采样
 	// 手动把s16转成fltp
@@ -236,25 +251,37 @@ void PushWork::pcmCallback(uint8_t* pcm, int32_t size)
 		fflush(pcm_s16le_fp_);
 	}
 	// 这里就约定好，音频捕获的时候，采样点数和编码器需要的点数是一样的
-	s16le_convert_to_fltp((short*)pcm, (float*)fltp_buf_, audio_frame_->nb_samples);
+	/*s16le_convert_to_fltp((short*)pcm, (float*)fltp_buf_, audio_frame_->nb_samples);*/
+
+	// 计算样本数量
+	int nb_samples = size / (2 * sizeof(short)); // 假设是双声道，每个样本 2 字节
 
 	ret = av_frame_make_writable(audio_frame_);
 	if (ret < 0) {
 		printf("av_frame_make_writable failed\n");
 		return;
 	}
+
+	// 执行 s16 到 fltp 的转换
+	audio_resample_->Convert(pcm, audio_frame_->data[0], nb_samples);
+	
+
+	// 设置 AVFrame 的其他属性，例如 nb_samples、channels、sample_rate 等
+	audio_frame_->nb_samples = nb_samples;
+	audio_frame_->channels = 2; // 双声道
+	audio_frame_->sample_rate = 48000;
 	// 将fltp_buf_写入frame
-	ret = av_samples_fill_arrays(audio_frame_->data,
-		audio_frame_->linesize,
-		fltp_buf_,
-		audio_frame_->channels,
-		audio_frame_->nb_samples,
-		(AVSampleFormat)audio_frame_->format,
-		0);
-	if (ret < 0) {
-		printf("av_samples_fill_arrays failed\n");
-		return;
-	}
+	//ret = av_samples_fill_arrays(audio_frame_->data,
+	//	audio_frame_->linesize,
+	//	fltp_buf_,
+	//	audio_frame_->channels,
+	//	audio_frame_->nb_samples,
+	//	(AVSampleFormat)audio_frame_->format,
+	//	0);
+	//if (ret < 0) {
+	//	printf("av_samples_fill_arrays failed\n");
+	//	return;
+	//}
 
 	int64_t pts = (int64_t)AVPublishTime::GetInstance()->get_audio_pts();
 	RET_CODE frame_code = RET_OK;
